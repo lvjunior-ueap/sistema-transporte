@@ -19,9 +19,9 @@ class AgendamentoResource extends Resource
 {
     protected static ?string $model = Agendamento::class;
 
-    protected static ?string $modelLabel = 'agendamento';
+    protected static ?string $modelLabel = 'viagem';
 
-    protected static ?string $pluralModelLabel = 'agendamentos';
+    protected static ?string $pluralModelLabel = 'viagens';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

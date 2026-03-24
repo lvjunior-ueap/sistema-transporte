@@ -3,10 +3,14 @@
 namespace App\Filament\Resources\Agendamentos\Tables;
 
 use App\Models\Agendamento;
+use App\Support\TravelMap;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -17,33 +21,41 @@ class AgendamentosTable
         return $table
             ->defaultSort('data_saida', 'desc')
             ->columns([
+                ViewColumn::make('trajeto')
+                    ->label('Trajeto')
+                    ->view('filament.resources.agendamentos.tables.columns.route-card'),
                 TextColumn::make('user.name')
                     ->label('Solicitante')
                     ->description(fn (Agendamento $record): ?string => $record->user?->email)
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('origem')
-                    ->label('Origem')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('destino')
-                    ->label('Destino')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('data_saida')
-                    ->label('Saida')
+                    ->label('Horario')
+                    ->icon(Heroicon::OutlinedClock)
+                    ->description(
+                        fn (Agendamento $record): ?string => TravelMap::travelDurationLabel(
+                            $record->data_saida?->toDateTimeString(),
+                            $record->data_retorno?->toDateTimeString(),
+                        )
+                    )
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
                 TextColumn::make('data_retorno')
                     ->label('Retorno')
+                    ->icon(Heroicon::OutlinedCalendar)
                     ->dateTime('d/m/Y H:i')
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 TextColumn::make('motorista.nome')
                     ->label('Motorista')
+                    ->icon(Heroicon::OutlinedUsers)
                     ->searchable()
                     ->placeholder('A definir'),
                 TextColumn::make('veiculo.placa')
                     ->label('Veiculo')
+                    ->badge()
+                    ->icon(Heroicon::OutlinedTruck)
                     ->description(fn (Agendamento $record): ?string => $record->veiculo?->modelo)
                     ->searchable()
                     ->sortable(),
@@ -75,6 +87,13 @@ class AgendamentosTable
                     ->preload(),
             ])
             ->recordActions([
+                Action::make('mapa')
+                    ->label('Mapa')
+                    ->icon(Heroicon::OutlinedMap)
+                    ->url(
+                        fn (Agendamento $record): ?string => TravelMap::routeUrl($record->origem, $record->destino),
+                        shouldOpenInNewTab: true,
+                    ),
                 EditAction::make(),
             ])
             ->toolbarActions([

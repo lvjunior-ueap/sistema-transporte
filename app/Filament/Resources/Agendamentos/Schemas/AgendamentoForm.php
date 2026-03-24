@@ -21,7 +21,7 @@ class AgendamentoForm
         return $schema
             ->components([
                 Section::make('Solicitacao')
-                    ->description('Informe quem solicitou a viagem e qual o recurso previsto para o atendimento.')
+                    ->description('Informe quem solicitou a viagem e qual recurso sera utilizado.')
                     ->columns(12)
                     ->schema([
                         Select::make('user_id')
@@ -61,43 +61,45 @@ class AgendamentoForm
                             ->columnSpan(4),
                     ]),
                 Section::make('Roteiro da viagem')
-                    ->description('Defina o deslocamento previsto e o motivo do agendamento.')
+                    ->description('Cadastre o ponto de saida, o ponto de partida e o horario da viagem.')
                     ->columns(12)
                     ->schema([
                         TextInput::make('origem')
-                            ->label('Origem')
+                            ->label('Ponto de saida')
                             ->required()
+                            ->placeholder('Ex.: Garagem central')
                             ->maxLength(255)
                             ->columnSpan(6),
                         TextInput::make('destino')
-                            ->label('Destino')
+                            ->label('Ponto de partida')
                             ->required()
+                            ->placeholder('Ex.: Aeroporto, hospital ou unidade')
                             ->maxLength(255)
                             ->columnSpan(6),
                         DateTimePicker::make('data_saida')
-                            ->label('Data de saida')
+                            ->label('Horario da viagem')
                             ->native(false)
                             ->seconds(false)
                             ->displayFormat('d/m/Y H:i')
                             ->format('Y-m-d H:i:s')
                             ->required()
                             ->live()
-                            ->columnSpan(3),
+                            ->columnSpan(4),
                         DateTimePicker::make('data_retorno')
-                            ->label('Data de retorno')
+                            ->label('Horario de retorno')
                             ->native(false)
                             ->seconds(false)
                             ->displayFormat('d/m/Y H:i')
                             ->format('Y-m-d H:i:s')
                             ->minDate(fn (Get $get) => $get('data_saida'))
                             ->rule('after:data_saida')
-                            ->required()
-                            ->columnSpan(3),
+                            ->helperText('Opcional. Preencha apenas quando a viagem tiver retorno previsto.')
+                            ->columnSpan(4),
                         Textarea::make('motivo')
                             ->label('Motivo da viagem')
                             ->required()
                             ->rows(5)
-                            ->columnSpanFull(),
+                            ->columnSpan(12),
                     ]),
             ]);
     }
